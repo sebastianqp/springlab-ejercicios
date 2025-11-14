@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
@@ -29,21 +30,27 @@ public class StudentServiceTest {
         // Crear y guardar un estudiante existente
         Student existing = new Student();
         existing.setFullName("Existing User");
-        existing.setEmail("duplicate@example.com");
+        existing.setEmail("test@example.com");
         existing.setBirthDate(LocalDate.of(2000, 10, 10));
         existing.setActive(true);
 
         repository.save(existing);
 
-
-
         // Crear la solicitud con el mismo email
         StudentRequestData req = new StudentRequestData();
         req.setFullName("Another User");
-        req.setEmail("duplicate@example.com");
+        req.setEmail("test@example.com");
         req.setBirthDate(LocalDate.of(1999, 5, 15));
 
         // Verificar que el servicio lanza excepción por email duplicado
         assertThatThrownBy(() -> service.create(req)).isInstanceOf(ConflictException.class);
+
+
+        // Verificar que no se duplique el registro
+        var result = repository.findByEmail("test@example.com");
+
+        // Verificar que el resultado existe y coincide
+        assertThat(result).isPresent();
+        assertThat(result.get().getFullName()).isEqualTo("Test User");
     }
 }
