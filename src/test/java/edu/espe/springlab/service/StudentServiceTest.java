@@ -53,4 +53,29 @@ public class StudentServiceTest {
         assertThat(result).isPresent();
         assertThat(result.get().getFullName()).isEqualTo("Test User");
     }
+    @Test
+    void DesactivarEstudiante() {
+        // 1. Crear estudiante activo
+        Student s = new Student();
+        s.setFullName("Test User");
+        s.setEmail("test@example.com");
+        s.setBirthDate(LocalDate.of(2000, 10, 10));
+        s.setActive(true);
+
+        Student saved = repository.save(s);
+        Long id = saved.getId();
+
+        // 2. Llamar al metodo de desactivacion
+        service.deactivate(id);
+
+        // 3. Recuperar el estudiante del repositorio
+        Student reloaded = repository.findById(id).orElseThrow();
+
+        // 4. Verificar:
+        assertThat(reloaded.getActive()).isFalse();
+        assertThat(reloaded.getFullName()).isEqualTo("Test User");
+        assertThat(reloaded.getEmail()).isEqualTo("test@example.com");
+        assertThat(reloaded.getBirthDate()).isEqualTo(LocalDate.of(2000, 10, 10));
+    }
 }
+

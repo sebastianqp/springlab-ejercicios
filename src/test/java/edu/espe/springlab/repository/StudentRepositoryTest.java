@@ -42,12 +42,44 @@ public class StudentRepositoryTest {
 
     }
     @Test
-    void shouldThrowNotFoundWhenIdDoesNotExist() {
-        long nonExistingId = 9999L;
+    void NoExisteID() {
+        long noExistingId = 9999;
 
-        assertThatThrownBy(() -> studentService.getById(nonExistingId))
+        assertThatThrownBy(() -> studentService.getById(noExistingId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("9999");
+    }
+
+    @Test
+    void prueba6() {
+        Student s1 = new Student();
+        s1.setFullName("Ana");
+        s1.setEmail("ana@example.com");
+        s1.setBirthDate(LocalDate.of(2003, 18, 10));
+        s1.setActive(true);
+
+        Student s2 = new Student();
+        s2.setFullName("Andrea");
+        s2.setEmail("andrea@example.com");
+        s2.setBirthDate(LocalDate.of(2000, 18, 5));
+        s2.setActive(true);
+
+        Student s3 = new Student();
+        s3.setFullName("Juan");
+        s3.setEmail("juan@example.com");
+        s3.setBirthDate(LocalDate.of(2000, 7, 1));
+        s3.setActive(true);
+
+        repository.save(s1);
+        repository.save(s2);
+        repository.save(s3);
+
+        var result = repository.findByFullNameContainingIgnoreCase("an");
+
+        assertThat(result)
+                .extracting(Student::getFullName)
+                .containsExactlyInAnyOrder("Ana", "Andrea")
+                .doesNotContain("Juan");
     }
 
 }
